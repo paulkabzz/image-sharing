@@ -58,7 +58,7 @@ const Profile = () => {
               <h1 className="text-center xl:text-left h3-bold md:h1-semibold w-full !text-[#131313]">
                 {currentUser.name}
               </h1>
-              <p className="small-regular md:body-medium text-light-3 text-center xl:text-left flex align-center">
+              <p className="small-regular md:body-medium text-center text-light-3 xl:text-left ">
                 @{currentUser.username}
                 { currentUser.$id === "6574132c122c08a82c39" && <img src="/assets/images/verified.png" alt="verified" style={{height: "16px", width: "16px"}} className="mt-[4.5px] ml-1"/>}
 

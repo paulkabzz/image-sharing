@@ -86,6 +86,11 @@ const PostForm = ({ post, action }: PostFormProps) => {
 
   const loading = isLoadingCreate || isLoadingUpdate;
 
+  const handleCancel = () => {
+    // Navigate back to the previous page
+    navigate(-1);
+  };
+
   return (
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-9 w-full max-w-5xl">
@@ -142,7 +147,13 @@ const PostForm = ({ post, action }: PostFormProps) => {
         )}
       />
       <div className="flex gap-4 items-center justify-end">
-        <Button type="button" className="shad-button_dark_4">Cancel</Button>
+        <Button 
+          type="button" 
+          className="shad-button_dark_4" 
+          onClick={handleCancel}
+        >
+          Cancel
+        </Button>
       
         <Button type="submit" className="shad-button_primary whitespace-nowrap" disabled={loading}>
           { loading ? <Loader isDark={false} /> : action }

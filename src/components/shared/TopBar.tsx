@@ -19,12 +19,12 @@ const TopBar = () => {
     <section className="topbar">
         <div className="flex-between py-4 px-5">
             <Link to="/" className="flex gap-3 items-center">
-                <img src="/assets/images/logo.svg" alt="logo" width={130} height={325}/>
+                <img src="/assets/images/logo-small.png" alt="logo" width={30} height={30}/>
             </Link>
        
         <div className="flex gap-4">
           <Button variant={'ghost'} className="shad-button_ghost" onClick={() => signOut()}>
-            <img src="/assets/icons/logout.svg" alt="logout" />
+            <img src="/assets/icons-png/logout.png" width={20} height={20} alt="logout" />
 
           </Button>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
