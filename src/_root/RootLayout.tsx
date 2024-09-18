@@ -1,7 +1,7 @@
-import Bottombar from "@/components/shared/Bottombar"
-import LeftSidebar from "@/components/shared/LeftSidebar"
-import TopBar from "@/components/shared/TopBar"
-import { Outlet } from "react-router-dom"
+import Bottombar from "@/components/shared/Bottombar";
+import LeftSidebar from "@/components/shared/LeftSidebar";
+import TopBar from "@/components/shared/TopBar";
+import { Outlet } from "react-router-dom";
 
 const RouteLayout = () => {
   return (
@@ -14,7 +14,7 @@ const RouteLayout = () => {
 
       <Bottombar />
     </div>
-  )
-}
+  );
+};
 
-export default RouteLayout
+export default RouteLayout;

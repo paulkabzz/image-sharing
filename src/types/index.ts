@@ -1,11 +1,11 @@
 export type IContextType = {
-  user: IUser,
-  isLoading: boolean,
-  setUser: React.Dispatch<React.SetStateAction<IUser>>,
-  isAuthenticated: boolean,
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>,
-  checkAuthUser: () => Promise<boolean>
-}
+  user: IUser;
+  isLoading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  checkAuthUser: () => Promise<boolean>;
+};
 
 
 export type INavLink = {
@@ -52,8 +52,8 @@ export type INavLink = {
   };
   
   export type INewUser = {
-    name: string,
-    email: string,
-    username: string,
-    password: string,
+    name: string;
+    email: string;
+    username: string;
+    password: string;
   };

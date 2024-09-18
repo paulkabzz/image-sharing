@@ -1,4 +1,4 @@
-import {Outlet, Navigate} from 'react-router-dom'
+import {Outlet, Navigate} from 'react-router-dom';
 
 const AuthLAyout = () => {
 
@@ -21,7 +21,7 @@ const AuthLAyout = () => {
         </>
         )}
     </>
-  )
-}
+  );
+};
 
-export default AuthLAyout
+export default AuthLAyout;

@@ -1,7 +1,7 @@
-import PostForm from "@/components/forms/PostForm"
-import Loader from "@/components/shared/Loader"
-import { useGetPostById } from "@/lib/react-query/queriesAndMutations"
-import { useParams } from "react-router-dom"
+import PostForm from "@/components/forms/PostForm";
+import Loader from "@/components/shared/Loader";
+import { useGetPostById } from "@/lib/react-query/queriesAndMutations";
+import { useParams } from "react-router-dom";
 
 const EditPost = () => {
 
@@ -24,7 +24,7 @@ const EditPost = () => {
             <PostForm action="Update" post={post}/>
         </div>
     </div>
-  )
-}
+  );
+};
 
-export default EditPost
+export default EditPost;

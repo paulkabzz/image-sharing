@@ -1,11 +1,11 @@
-import AuthLAyout from './_auth/AuthLAyout'
-import SignInForm from './_auth/forms/SignInForm'
-import SignUpForm from './_auth/forms/SignUpForm'
-import RootLayout from './_root/RootLayout'
-import { AllUsers, CreatePost, EditPost, Explore, Home, PostDetails, Profile, Saved, UpdateProfile } from './_root/pages'
-import './globals.css'
-import {Routes, Route} from 'react-router-dom'
-import { Toaster } from "@/components/ui/toaster"
+import AuthLAyout from '@/_auth/AuthLAyout';
+import SignInForm from '@/_auth/forms/SignInForm';
+import SignUpForm from '@/_auth/forms/SignUpForm';
+import RootLayout from '@/_root/RootLayout'
+import { AllUsers, CreatePost, EditPost, Explore, Home, PostDetails, Profile, Saved, UpdateProfile } from '@/_root/pages';
+import '@/globals.css';
+import { Routes, Route } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
 
 
 const App = () => {
@@ -38,7 +38,7 @@ const App = () => {
 
             <Toaster />
         </main>
-  )
-}
+  );
+};
 
-export default App
+export default App;

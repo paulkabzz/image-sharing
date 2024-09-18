@@ -3,7 +3,7 @@ import { useDeleteSavedPost, useGetCurrenUser, useLikePost, useSavePost } from "
 import { checkIsLiked } from "@/lib/utils"
 import { Models } from "appwrite"
 import React, { useState, useEffect } from "react"
-import Loader from "./Loader"
+import Loader from "@/components/shared/Loader"
 
 type PostStatsProps = {
     post?: Models.Document,
@@ -26,7 +26,7 @@ type PostStatsProps = {
     const { data: currentUser } = useGetCurrenUser();
     const savedPostRecord = currentUser?.save.find((record: Models.Document) => record.post.$id === post?.$id);
 
-    useEffect(() => setIsSaved(!!savedPostRecord), [currentUser])
+    useEffect(() => setIsSaved(!!savedPostRecord), [currentUser]);
 
 
     const handleLikePost = (e: React.MouseEvent) => {
@@ -44,7 +44,7 @@ type PostStatsProps = {
         };
 
         setLikes(newLikes);
-        likePost({ postId: post?.$id || '', likesArray: newLikes })
+        likePost({ postId: post?.$id || '', likesArray: newLikes });
 
     }
 
@@ -58,7 +58,7 @@ type PostStatsProps = {
        }
 
         setIsSaved(true);
-        savePost({ postId: post?.$id || '', userId })
+        savePost({ postId: post?.$id || '', userId });
     }
 
   return (

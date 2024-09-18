@@ -2,7 +2,7 @@ import { useUserContext } from "@/context/AuthContext"
 import { formatRelativeDate } from "@/lib/utils"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
-import PostStats from "./PostStats"
+import PostStats from "@/components/shared/PostStats"
 
 type PostCardProps = {
     post: Models.Document,
