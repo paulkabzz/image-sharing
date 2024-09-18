@@ -1,0 +1,237 @@
+import { useEffect, useState } from "react";
+import Select from "react-select";
+import AsyncSelect from "react-select/async";
+import { useCreatePost } from "@/lib/react-query/queriesAndMutations";
+import { useUserContext } from "@/context/AuthContext";
+import { useToast } from "../ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "../ui/textarea";
+import FileUploader from "../shared/FileUploader";
+import { PostValidation } from "@/lib/validation";
+import { Models } from "appwrite";
+import { FormEvent } from "react";
+import { Button } from "../ui/button";
+
+type PostFormProps = {
+  post?: Models.Document;
+};
+
+const PostForm = ({ post }: PostFormProps) => {
+  const { mutateAsync: createPost, isPending: isLoadingCreate } = useCreatePost();
+  const { user } = useUserContext();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof PostValidation>>({
+    resolver: zodResolver(PostValidation),
+    defaultValues: {
+      caption: post ? post.caption : "",
+      file: [],
+      location: post ? post.location : "",
+      tags: post ? post.tags.join(",").slice() : "",
+    },
+  });
+
+  const [selectedLocation, setSelectedLocation] = useState<{ value: string; label: string } | null>(
+    post && post.location ? { value: post.location, label: post.location } : null
+  );
+
+  const OPENCAGE_API_ENDPOINT = import.meta.env.OPENCAGE_API_ENDPOINT;
+  const OPENCAGE_API_KEY = import.meta.env.OPENCAGE_API_KEY;
+
+const loadOptions = async (inputValue: string) => {
+  try {
+    const response = await fetch(`${OPENCAGE_API_ENDPOINT}?q=${encodeURIComponent(inputValue)}&key=${OPENCAGE_API_KEY}`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to fetch location suggestions. Status: ${response.status}, Message: ${errorData.status.message}`);
+    }
+
+    const data = await response.json();
+    
+    return data.results.map((result: any) => ({
+      value: result.formatted,
+      label: result.formatted,
+    }));
+  } catch (error) {
+    console.error('Error fetching location suggestions:', error);
+    return [];
+  }
+};
+
+
+  const handleLocationChange = (selectedOption: { value: string; label: string } | null) => {
+    setSelectedLocation(selectedOption);
+    // You can also set the location value in the form here if needed
+    // form.setValue("location", selectedOption?.value || "");
+  };
+
+  const onSubmit = async (values: z.infer<typeof PostValidation>, e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newPost = await createPost({
+      ...values,
+      userId: user.id,
+      location: selectedLocation?.value || "", // Use the selected location value
+    });
+
+    if (!newPost) {
+      toast({
+        title: "Please try again.",
+      });
+    }
+    navigate("/");
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={(e) => onSubmit(form.getValues(), e)} className="flex flex-col gap-9 w-full max-w-5xl">
+      <FormField
+        control={form.control}
+        name="caption"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="shad-form_label">Caption</FormLabel>
+            <FormControl>
+              <Textarea  {...field} className="shad-textarea custom-scrollbar"/>
+            </FormControl>
+            <FormMessage className="shad-form_message"/>
+          </FormItem>
+        )}
+      />
+         <FormField
+        control={form.control}
+        name="file"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="shad-form_label">Add Photos</FormLabel>
+            <FormControl>
+              <FileUploader fieldChange={field.onChange}  mediaUrl={post?.imageUrl}/>
+            </FormControl>
+            <FormMessage className="shad-form_message"/>
+          </FormItem>
+        )}
+      />
+        {/* Other form fields... */}
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="shad-form_label">Add Location</FormLabel>
+              <FormControl>
+                {/* Use AsyncSelect for asynchronous suggestions */}
+                <AsyncSelect
+                  {...field}
+                  isClearable
+                  placeholder="Type a city"
+                  value={selectedLocation}
+                  onChange={handleLocationChange}
+                  loadOptions={loadOptions}
+                  
+                />
+              </FormControl>
+              <FormMessage className="shad-form_message" />
+            </FormItem>
+          )}
+        />
+        {/* Other form fields... */}
+        <FormField
+        control={form.control}
+        name="tags"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="shad-form_label">Add Tags (Sperated by comma ",")</FormLabel>
+            <FormControl>
+              <Input type="text" className="shad-input" placeholder="Sport, Music, Expression, etc." {...field} />
+            </FormControl>
+            <FormMessage className="shad-form_message"/>
+          </FormItem>
+        )}
+      />
+       <div className="flex gap-4 items-center justify-end">
+        <Button type="button" className="shad-button_dark_4">Cancel</Button>
+        <Button type="submit" className="shad-button_primary whitespace-nowrap">Submit</Button>
+      </div>
+      </form>
+    </Form>
+  );
+};
+
+export default PostForm;
+
+
+/ts.config:
+/** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
+module.exports = {
+  darkMode: ['class'],
+  content: [
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      
+      },
+    },
+    extend: {
+      colors: {
+        'primary-500': '#877EFF',
+        'primary-600': '#5D5FEF',
+        'secondary-500': '#FFB620',
+        'off-white': '#D0DFFF',
+        'red': '#FF5A5A',
+        'dark-1': '#000000',
+        'dark-2': '#09090A',
+        'dark-3': '#101012',
+        'dark-4': '#1F1F22',
+        'light-1': '#FFFFFF',
+        'light-2': '#EFEFEF',
+        'light-3': '#7878A3',
+        'light-4': '#5C5C7B',
+        
+      },
+      screens: {
+        'xs': '480px',
+      
+      },
+      width: {
+        '420': '420px',
+        '465': '465px',
+      },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+
+      },
+      keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+    },
+  },
+  plugins: [require('tailwindcss-animate')],
+};
