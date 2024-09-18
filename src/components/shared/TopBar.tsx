@@ -28,7 +28,10 @@ const TopBar = () => {
 
           </Button>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
-            <img src={user.imageUrl || '/assets/images/profile-placeholder.svg'} alt="profile" className="h-8 w-8 rounded-full" />
+          <div className="h-8 w-8 rounded-full overflow-hidden">
+              <img src={user.imageUrl || '/assets/images/profile-placeholder.svg'} alt="profile" className="h-full w-full object-cover" />
+          </div>
+            
           </Link>
           </div>
           </div>

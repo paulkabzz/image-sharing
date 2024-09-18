@@ -11,7 +11,7 @@ type GrindPostListProps = {
 
 const GridPostList = ({ posts, showUser = true, showStats = true } : GrindPostListProps) => {
 
-    const { user } = useUserContext()
+    const { user } = useUserContext();
 
   return (
     <ul className="grid-container ">
@@ -24,7 +24,9 @@ const GridPostList = ({ posts, showUser = true, showStats = true } : GrindPostLi
                     <div className="grid-post_user">
                         {showUser && (
                             <div className="flex items-center justify-start gap-2">
-                                <img src={post.creator.imageUrl} alt={post.creator.username} className="h-8 w-8 rounded-full"/>
+                                <div className="overflow-hidden w-8 h-8 rounded-full">
+                                    <img src={post.creator.imageUrl} alt={post.creator.username} className="w-full h-full object-cover" />
+                                </div>
                                 <p className="line-clamp-1 flex whitespace-nowrap overflow-ellipsis !lowercase">{post.creator.username} { post.creator.$id === import.meta.env.VITE_FOUNDER_ID && <img src="/assets/images/verified.png" alt="verified" style={{height: "16px", width: "16px"}} className="mt-[5px] ml-1"/>}</p>
                             </div>
                         )}
