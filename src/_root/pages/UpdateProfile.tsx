@@ -56,6 +56,7 @@ const UpdateProfile = () => {
       userId: currentUser.$id,
       name: value.name,
       bio: value.bio,
+      username: value.username,
       file: value.file,
       imageUrl: currentUser.imageUrl,
       imageId: currentUser.imageId,
