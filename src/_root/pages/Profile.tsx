@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Route,
   Routes,
@@ -62,7 +63,7 @@ const Profile = () => {
                 {currentUser.name}
               </h1>
               <p className="small-regular md:body-medium text-center text-light-3 xl:text-left ">
-                @{currentUser.username}
+                @{currentUser.username.toLowerCase()}
                 { currentUser.$id === "6574132c122c08a82c39" && <img src="/assets/images/verified.png" alt="verified" style={{height: "16px", width: "16px"}} className="mt-[4.5px] ml-1"/>}
 
               </p>
@@ -75,7 +76,12 @@ const Profile = () => {
             </div>
 
             <p className="small-medium md:base-medium !text-[#131313] !text-[13px] text-center xl:text-left mt-7 max-w-screen-sm">
-              {currentUser.bio}
+              {currentUser.bio.split('\n').map((line: string, index: number) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < currentUser.bio.split('\n').length - 1 && <br />}
+                </React.Fragment>
+              ))}
             </p>
           </div>
 

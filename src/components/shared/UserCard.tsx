@@ -24,7 +24,7 @@ const UserCard = ({ user }: UserCardProps) => {
           {user.name}
         </p>
         <p className="text-[13px] font-normal leading-[140%] text-light-3 text-center justify-center items-center line-clamp-1 flex whitespace-nowrap overflow-ellipsis">
-          @{user.username.toLowerCase()}
+          @{user.username.toLowerCase().length > 10 ? user.username.slice(0, 10) + "..." : user.username.toLowerCase()}
           { user.$id === import.meta.env.VITE_FOUNDER_ID && <img src="/assets/images/verified.png" alt="verified" style={{height: "16px", width: "16px"}} className="ml-1"/>}
 
         </p>

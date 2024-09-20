@@ -559,6 +559,7 @@ export async function getUsers(limit?: number) {
           bio: user.bio,
           imageUrl: image.imageUrl,
           imageId: image.imageId,
+          username: user.username,
         }
       );
   

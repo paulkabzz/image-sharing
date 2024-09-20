@@ -21,6 +21,7 @@ export type INavLink = {
     bio: string;
     imageId: string;
     imageUrl: URL | string;
+    username: string;
     file: File[];
   };
   
