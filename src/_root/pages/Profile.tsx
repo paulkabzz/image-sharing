@@ -76,7 +76,7 @@ const Profile = () => {
             </div>
 
             <p className="small-medium md:base-medium !text-[#131313] !text-[13px] text-center xl:text-left mt-7 max-w-screen-sm">
-              {currentUser.bio.split('\n').map((line: string, index: number) => (
+              {currentUser.bio !== null && currentUser.bio !== "" && currentUser.bio.split('\n').map((line: string, index: number) => (
                 <React.Fragment key={index}>
                   {line}
                   {index < currentUser.bio.split('\n').length - 1 && <br />}
