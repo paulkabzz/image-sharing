@@ -36,7 +36,6 @@ export const AuthProvider = ({ children}: {children: ReactNode}) => {
 
     const checkAuthUser = async () => {
             try {
-                console.log('Checking authentication status...');
 
                 const currentAccount = await getCurrentUser()
 
