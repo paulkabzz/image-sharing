@@ -11,11 +11,15 @@ const UserCard = ({ user }: UserCardProps) => {
   return (
     <Link to={`/profile/${user.$id}`} className="user-card">
       <div className="rounded-full w-14 h-14 overflow-hidden">
-        <img
-          src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
-          alt="creator"
-          className="w-full h-full object-cover rounded-full"
-        />
+        <picture>
+            <source srcSet={user.imageUrl} type="image/webp" />
+            <img
+                src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                alt="creator"
+                className="w-full h-full object-cover rounded-full"
+                loading="lazy"
+            />
+        </picture>
       </div>
      
 

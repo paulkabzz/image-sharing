@@ -33,11 +33,17 @@ const ProfileUploader = ({ fieldChange, mediaUrl }: ProfileUploaderProps) => {
       <input {...getInputProps()} className="cursor-pointer" />
 
       <div className="cursor-pointer flex-center gap-4">
-        <img
-          src={fileUrl || "/assets/icons/profile-placeholder.svg"}
-          alt="image"
-          className="h-24 w-24 rounded-full object-cover object-top"
-        />
+        <picture>
+          <source srcSet={fileUrl || "/assets/icons/profile-placeholder.svg"} type="image/webp" />
+          <img
+            src={fileUrl || "/assets/icons/profile-placeholder.svg"}
+            alt="profile image"
+            className="h-24 w-24 rounded-full object-cover object-top"
+            loading="lazy"
+            width={96}
+            height={96}
+          />
+        </picture>
         <p className="text-primary-500 small-regular md:bbase-semibold">
           Change profile photo
         </p>

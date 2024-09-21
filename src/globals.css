@@ -136,7 +136,7 @@
 
   /* Home */
   .home-container {
-    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar;
+    @apply flex flex-col flex-1 items-center gap-10 overflow-scroll py-10 px-3 md:px-8 lg:p-14 custom-scrollbar;
   }
 
   .home-posts {
@@ -232,7 +232,7 @@
   }
 
   .post-card_img {
-    @apply h-64 xs:h-[550px] lg:h-[600px] w-full rounded-[24px] object-cover mb-5;
+    @apply h-[25rem] xs:h-[550px] lg:h-[600px] w-full rounded-[24px] object-cover mb-5;
   }
 
   /* Topbar */

@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { createPost, createUserAccount, deletePost, deleteSavedPost, getCurrentUser, getInfinitePosts, getPostById, getRecentPosts, getUserById, getUserPosts, getUsers, likePost, savePost, searchPosts, signInAccount, signOutAccount, updatePost, updateUser } from '@/lib/appwrite/api';
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from '@/types';
+import { createStory, getRecentStories, deleteExpiredStories } from '@/lib/appwrite/api';
+
+import { createPost, createUserAccount, deletePost, deleteSavedPost, getCurrentUser, getInfinitePosts, getPostById, getRecentPosts, getUserById, getUserPosts, getUsers, likePost, savePost, searchPosts, signInAccount, signOutAccount, updatePost, updateUser, deleteStory, updateStoryViews } from '@/lib/appwrite/api';
+import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewStory } from '@/types';
+import { databases, appwriteConfig } from '@/lib/appwrite/config';
+import { Query } from 'appwrite';
 
 import { QUERY_KEYS } from './queryKeys'
 
@@ -216,3 +220,87 @@ export const useGetUsers = (limit?: number) => {
       enabled: !!userId,
     });
   };
+
+export const useCreateStory = () => {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: (story: INewStory) => createStory(story),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_RECENT_STORIES]
+            });
+        },
+    });
+};
+
+export const useGetRecentStories = () => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.GET_RECENT_STORIES],
+        queryFn: getRecentStories,
+    });
+};
+
+export const useDeleteExpiredStories = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: deleteExpiredStories,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [QUERY_KEYS.GET_RECENT_STORIES]
+            });
+        },
+    });
+};
+
+
+// ... existing code ...
+
+export const useDeleteStory = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (storyId: string) => deleteStory(storyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_RECENT_STORIES]
+      });
+    },
+  });
+};
+
+export const useUpdateStoryViews = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ storyId, userId, creatorId }: { storyId: string, userId: string, creatorId: string }) => 
+      updateStoryViews(storyId, userId, creatorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['storyViews']
+      });
+    },
+  });
+};
+
+// Add this new query hook
+export const useGetStoryViews = (userId: string) => {
+  return useQuery({
+    queryKey: ['storyViews', userId],
+    queryFn: async () => {
+      try {
+        const response = await databases.listDocuments(
+          appwriteConfig.databaseId,
+          appwriteConfig.storyViewsCollectionId, // Make sure this is the correct ID for your StoryViews collection
+          [Query.equal("userId", userId)]
+        );
+        return response.documents.map((doc: any) => doc.storyId);
+      } catch (error) {
+        console.error("Error fetching story views:", error);
+        return [];
+      }
+    },
+    enabled: !!userId
+  });
+};

@@ -1,5 +1,6 @@
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewStory } from "@/types";
 import { account, appwriteConfig, avatars, databases, storage } from "@/lib/appwrite/config";
+
 import { ID, Query } from "appwrite";
 
 // ============================== CREATE USER ============================== \\
@@ -119,10 +120,17 @@ export async function signOutAccount() {
 
 export async function createPost(post: INewPost) {
     try {
+        if (!post.file || post.file.length === 0) {
+            throw new Error("No file provided");
+        }
+
+        const file = post.file[0];
+        if (!(file instanceof File)) {
+            throw new Error("Invalid file object");
+        }
 
         //upload image to storage
-
-        const uploadedFile = await uploadFile(post.file[0]);
+        const uploadedFile = await uploadFile(file);
 
         if (!uploadedFile) throw Error;
 
@@ -164,16 +172,19 @@ export async function createPost(post: INewPost) {
         return newPost;
 
     } catch (error) {
-        console.error(error);
-        return;
+        console.error("Error in createPost:", error);
+        throw error; // Re-throw the error for the caller to handle
     }
     
 }
 
 // ============================== UPLOAD FILE ============================== \\
 
-export async function uploadFile (file: File) {
+export async function uploadFile(file: File) {
     try {
+        if (!(file instanceof File)) {
+            throw new Error("Invalid file object");
+        }
 
         const uploadedFile = await storage.createFile(
             appwriteConfig.storageId,
@@ -183,8 +194,8 @@ export async function uploadFile (file: File) {
 
         return uploadedFile;
     } catch (error) {
-        console.error(error);
-        return;
+        console.error("Error in uploadFile:", error);
+        throw error; // Re-throw the error for the caller to handle
     }
 }
 
@@ -583,3 +594,173 @@ export async function getUsers(limit?: number) {
       console.log(error);
     }
   }
+
+// ============================== CREATE STORY ============================== \\
+
+export async function createStory(story: INewStory) {
+    try {
+        if (!story.file || story.file.length === 0) {
+            throw new Error("No file provided");
+        }
+
+        const file = story.file[0];
+        if (!(file instanceof File)) {
+            throw new Error("Invalid file object");
+        }
+
+        // Upload image to storage
+        const uploadedFile = await uploadFile(file);
+
+        if (!uploadedFile) throw Error;
+
+        // Get file URL
+        const fileUrl = getFilePreview(uploadedFile.$id);
+
+        if(!fileUrl) {
+            deleteFile(uploadedFile.$id);
+            throw Error;
+        }
+
+        // Save story to DB
+        const newStory = await databases.createDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.storyCollectionId,
+            ID.unique(),
+            {
+                creator: story.userId,
+                imageUrl: fileUrl,
+                imageId: uploadedFile.$id,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
+            }
+        );
+
+        if (!newStory) {
+            await deleteFile(uploadedFile.$id);
+            throw Error;
+        }
+
+        return newStory;
+
+    } catch (error) {
+        console.error("Error in createStory:", error);
+        throw error;
+    }
+}
+
+// ============================== GET RECENT STORIES ============================== \\
+
+export async function getRecentStories() {
+    const stories = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.storyCollectionId,
+        [
+            Query.orderDesc('$createdAt'),
+            Query.greaterThan('expiresAt', new Date().toISOString()),
+            Query.limit(50)
+        ]
+    );
+
+    if(!stories) throw Error;
+    return stories;
+}
+
+// ============================== DELETE EXPIRED STORIES ============================== \\
+
+export async function deleteExpiredStories() {
+    try {
+        const expiredStories = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.storyCollectionId,
+            [Query.lessThan('expiresAt', new Date().toISOString())]
+        );
+
+        for (const story of expiredStories.documents) {
+            await databases.deleteDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.storyCollectionId,
+                story.$id
+            );
+            await deleteFile(story.imageId);
+        }
+
+        return { status: 'ok' };
+    } catch (error) {
+        console.error("Error in deleteExpiredStories:", error);
+        throw error;
+    }
+}
+
+// ============================== DELETE STORY ============================== \\
+export async function deleteStory(storyId: string) {
+    try {
+        // First, get the story to retrieve the imageId
+        const story = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.storyCollectionId,
+            storyId
+        );
+
+        if (!story) {
+            throw new Error("Story not found");
+        }
+
+        // Delete the story document
+        await databases.deleteDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.storyCollectionId,
+            storyId
+        );
+
+        // Delete the associated image
+        await storage.deleteFile(
+            appwriteConfig.storageId,
+            story.imageId
+        );
+
+        return { status: 'ok' };
+    } catch (error) {
+        console.error("Error in deleteStory:", error);
+        throw error;
+    }
+}
+
+// ============================== UPDATE STORY VIEWS ============================== \\
+
+
+
+export async function updateStoryViews(storyId: string, userId: string, creatorId: string) {
+    try {
+        // Don't update view count if the viewer is the creator
+        if (userId === creatorId) {
+            return { success: true, viewAdded: false };
+        }
+
+        const existingView = await databases.listDocuments(
+            appwriteConfig.databaseId,
+            appwriteConfig.storyViewsCollectionId,
+            [
+                Query.equal('storyId', storyId),
+                Query.equal('userId', userId)
+            ]
+        );
+
+        if (existingView.documents.length === 0) {
+            await databases.createDocument(
+                appwriteConfig.databaseId,
+                appwriteConfig.storyViewsCollectionId,
+                ID.unique(),
+                {
+                    storyId: storyId,
+                    userId: userId,
+                    viewedAt: new Date().toISOString()
+                }
+            );
+            return { success: true, viewAdded: true };
+        } else {
+            return { success: true, viewAdded: false };
+        }
+    } catch (error) {
+        console.error("Error in updateStoryViews:", error);
+        throw error;
+    }
+}

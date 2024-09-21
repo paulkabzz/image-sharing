@@ -31,8 +31,10 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
       fileUrl ? ( 
         <> 
         <div className='flex flex-1 justify-center w-full p-5 lg:p-10'>
-            <img src={fileUrl} alt='image' className='file_uploader-img'/>
-           
+            <picture>
+                <source srcSet={fileUrl} type="image/webp" />
+                <img src={fileUrl} alt='uploaded image' className='file_uploader-img' loading="lazy" />
+            </picture>
          </div> 
          <p className='file_uploader-label'>
             Click or drag photo to replace
@@ -41,7 +43,7 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
      
       ): (
       <div className='file_uploader-box'>
-            <img src="/assets/icons/file-upload.svg" alt="File upload" width={96} height={77} />
+            <img src="/assets/icons/file-upload.svg" alt="File upload" width={96} height={77} loading="lazy" />
             <h3 className='base-medium text-[#aaa] mb-2 mt-6'>
                 Drag photo here or click to upload
             </h3>

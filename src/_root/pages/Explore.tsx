@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,7 @@ const SearchResults = ({ isSearchFetching, searchedPosts }: SearchResultProps) =
 
 const Explore = () => {
   const { ref, inView } = useInView();
-  const { data: posts, fetchNextPage, hasNextPage } = useGetPosts();
+  const { data: posts, fetchNextPage, hasNextPage, isLoading: isPostLoading } = useGetPosts();
 
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);
@@ -37,18 +37,25 @@ const Explore = () => {
     if (inView && !searchValue) {
       fetchNextPage();
     }
-  }, [inView, searchValue]);
+  }, [inView, searchValue, fetchNextPage]);
 
-  if (!posts)
-    return (
-      <div className="flex-center w-full h-full">
-        <Loader isDark={false} />
-      </div>
-    );
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  }, []);
 
   const shouldShowSearchResults = searchValue !== "";
-  const shouldShowPosts = !shouldShowSearchResults && 
-    posts.pages.every((item) => item?.documents.length === 0);
+  const shouldShowPosts = useMemo(() => {
+    return !shouldShowSearchResults && 
+      posts?.pages.every((item) => item?.documents.length === 0);
+  }, [shouldShowSearchResults, posts]);
+
+  if (isPostLoading) {
+    return (
+      <div className="flex-center w-full h-full">
+        <Loader isDark={true} />
+      </div>
+    );
+  }
 
   return (
     <div className="explore-container">
@@ -66,10 +73,7 @@ const Explore = () => {
             placeholder="Search"
             className="explore-search !text-[14px] text-[#131313]"
             value={searchValue}
-            onChange={(e) => {
-              const { value } = e.target;
-              setSearchValue(value);
-            }}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -94,6 +98,8 @@ const Explore = () => {
             isSearchFetching={isSearchFetching}
             searchedPosts={searchedPosts}
           />
+        ) : !posts || posts.pages.length === 0 ? (
+          <p className="text-light-4 mt-10 text-center w-full">No posts found</p>
         ) : shouldShowPosts ? (
           <p className="text-light-4 mt-10 text-center w-full text-[14px]">End of posts</p>
         ) : (
@@ -105,7 +111,7 @@ const Explore = () => {
 
       {hasNextPage && !searchValue && (
         <div ref={ref} className="mt-10">
-          <Loader isDark={false} />
+          <Loader isDark={true} />
         </div>
       )}
     </div>

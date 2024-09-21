@@ -8,3 +8,4 @@ export {default as CreatePost} from './CreatePost';
 export {default as PostDetails} from './PostDetails';
 export {default as LikedPosts} from './LikedPosts';
 export {default as UpdateProfile} from './UpdateProfile';
+export {default as CreateStory} from './CreateStory';

@@ -58,3 +58,35 @@ export type INavLink = {
     username: string;
     password: string;
   };
+
+export type INewStory = {
+    userId: string;
+    file: File[];
+};
+
+export interface IViewer {
+    id: string;
+    username: string;
+    imageUrl: string;
+}
+
+export interface IStory {
+    $id: string;
+    $createdAt: string;
+    creator: {
+        $id: string;
+        username: string;
+        imageUrl: string;
+    };
+    imageUrl: string;
+    imageId: string;
+    expiresAt: string;
+    id: string;
+};
+
+export interface IStoryView {
+    $id: string;
+    storyId: string;
+    userId: string;
+    viewedAt: string;
+}

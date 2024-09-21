@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -49,6 +50,11 @@ const PostForm = ({ post, action }: PostFormProps) => {
     },
   })
  
+  // Add this function to handle file changes
+  const handleFileChange = useCallback((files: File[]) => {
+    form.setValue("file", files);
+  }, [form]);
+
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof PostValidation>) {
 
@@ -70,18 +76,37 @@ const PostForm = ({ post, action }: PostFormProps) => {
     }
 
     
-    const newPost = await createPost({
-        ...values,
-        userId: user.id,
-
-    })
-
-    if (!newPost) {
+    const fileToUpload = values.file[0];
+    if (!(fileToUpload instanceof File)) {
         toast({
-            title: "Please try again."
-        })
+          title: "Invalid file. Please select an image.",
+          variant: "destructive",
+        });
+        return;
     }
-    navigate('/')
+
+    try {
+        const newPost = await createPost({
+            ...values,
+            userId: user.id,
+            file: [fileToUpload], // Ensure we're passing a File object
+        });
+
+        if (!newPost) {
+            toast({
+                title: "Failed to create post. Please try again.",
+                variant: "destructive",
+            });
+        } else {
+            navigate('/');
+        }
+    } catch (error) {
+        console.error("Error creating post:", error);
+        toast({
+            title: "An error occurred. Please try again.",
+            variant: "destructive",
+        });
+    }
   }
 
   const loading = isLoadingCreate || isLoadingUpdate;
@@ -110,11 +135,11 @@ const PostForm = ({ post, action }: PostFormProps) => {
       <FormField
         control={form.control}
         name="file"
-        render={({ field }) => (
+        render={() => (
           <FormItem>
             <FormLabel className="shad-form_label">Add Photos</FormLabel>
             <FormControl>
-              <FileUploader fieldChange={field.onChange}  mediaUrl={post?.imageUrl}/>
+              <FileUploader fieldChange={handleFileChange}  mediaUrl={post?.imageUrl}/>
             </FormControl>
             <FormMessage className="shad-form_message"/>
           </FormItem>

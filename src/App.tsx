@@ -1,7 +1,8 @@
 import AuthLAyout from '@/_auth/AuthLAyout';
 import SignInForm from '@/_auth/forms/SignInForm';
 import SignUpForm from '@/_auth/forms/SignUpForm';
-import RootLayout from '@/_root/RootLayout'
+import RootLayout from '@/_root/RootLayout';
+import { CreateStory } from '@/_root/pages';
 import { AllUsers, CreatePost, EditPost, Explore, Home, PostDetails, Profile, Saved, UpdateProfile } from '@/_root/pages';
 import '@/globals.css';
 import { Routes, Route } from 'react-router-dom';
@@ -31,6 +32,7 @@ const App = () => {
                     <Route path='/profile/:id/*' element={<Profile />}/>
                     <Route path='/update-profile/:id' element={<UpdateProfile />}/>
                     <Route path='/explore' element={<Explore />}/>
+                    <Route path='/create-story' element={<CreateStory />}/>
                 </Route>
                 
 

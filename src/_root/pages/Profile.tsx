@@ -46,15 +46,22 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-inner_container">
-        <div className="flex xl:flex-row flex-col max-xl:items-center  flex-1 gap-7">
+        <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7">
           <div className="w-28 h-28 lg:h-36 lg:w-36 rounded-full overflow-hidden">
-            <img
-              src={
-                currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"
-              }
-              alt="profile"
-              className="w-full h-full object-cover"
-            />
+            <picture>
+              <source
+                srcSet={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                type="image/webp"
+              />
+              <img
+                src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                alt="profile"
+                className="w-full h-full object-cover"
+                loading="lazy"
+                width={144}
+                height={144}
+              />
+            </picture>
           </div>
          
           <div className="flex flex-col flex-1 justify-between md:mt-2">
@@ -118,6 +125,7 @@ const Profile = () => {
               alt="posts"
               width={20}
               height={20}
+              loading="lazy"
             />
             Posts
           </Link>
@@ -131,6 +139,7 @@ const Profile = () => {
               alt="like"
               width={20}
               height={20}
+              loading="lazy"
             />
             Liked Posts
           </Link>
