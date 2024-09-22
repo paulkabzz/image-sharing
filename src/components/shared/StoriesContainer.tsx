@@ -73,7 +73,7 @@ const StoriesContainer: React.FC = () => {
   if (!recentStories || recentStories.documents.length === 0) return <div>No stories to display</div>;
 
   return (
-    <div className="mb-8 w-full">
+    <div className="mb-0 w-full">
       <div className="flex overflow-x-auto gap-8 pb-4 w-full">
         <div className="flex flex-col items-center cursor-pointer">
           {userStories.length > 0 ? (
