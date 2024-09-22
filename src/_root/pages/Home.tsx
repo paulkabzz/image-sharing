@@ -3,7 +3,7 @@ import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queriesAndMuta
 import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
 import UserCard from "@/components/shared/UserCard";
-import StoriesContainer from "@/components/shared/StoriesContainer";
+// import StoriesContainer from "@/components/shared/StoriesContainer";
 import { useMemo } from "react";
 
 const Home = () => {
@@ -48,7 +48,7 @@ const Home = () => {
   return (
     <div className="flex flex-1">
       <div className="home-container">
-       <StoriesContainer />
+       {/* <StoriesContainer /> */}
         <div className="home-posts">
           {/* <h2 className="h3-bold md:h2-bold text-left w-full text-[#131313]">Home</h2> */}
           {isLoading ? (
