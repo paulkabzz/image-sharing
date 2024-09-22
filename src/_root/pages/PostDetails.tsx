@@ -70,8 +70,7 @@ const PostDetails = () => {
                   <div className="overflow-hidden w-8 h-8 lg:w-12 lg:h-12 rounded-full">
                     <img
                       src={
-                        post?.creator.imageUrl ||
-                        "/assets/icons/profile-placeholder.svg"
+                        post?.creator.imageId !== null ? post?.creator.imageUrl : "/assets/icons/profile-placeholder.svg"
                       }
                       alt="creator"
                       className="w-full h-full object-cover"

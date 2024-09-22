@@ -50,6 +50,7 @@ export type INavLink = {
     email: string;
     imageUrl: string;
     bio: string;
+    imageId: string;
   };
   
   export type INewUser = {
@@ -77,6 +78,7 @@ export interface IStory {
         $id: string;
         username: string;
         imageUrl: string;
+        imageId: string;
     };
     imageUrl: string;
     imageId: string;

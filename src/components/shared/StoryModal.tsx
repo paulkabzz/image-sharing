@@ -82,7 +82,7 @@ const StoryModal: React.FC<StoryModalProps> = ({ isOpen, onClose, stories, curre
                 onTouchStart={() => setIsPaused(true)}
                 onTouchEnd={() => setIsPaused(false)}
             >
-                <img src={currentStory.imageUrl} alt="Story" className="w-full h-auto rounded-lg mb-4" />
+                <img src={currentStory.imageUrl} alt="Story" loading='lazy' className="w-full h-auto rounded-lg mb-4" />
                 <p className="text-light-1 text-sm mb-2">Posted by: {currentStory.creator.username}</p>
                 {currentStory.creator.$id === user.id && (
                     <p className="text-light-1 text-sm mb-2">

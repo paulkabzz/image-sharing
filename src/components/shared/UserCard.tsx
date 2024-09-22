@@ -12,9 +12,9 @@ const UserCard = ({ user }: UserCardProps) => {
     <Link to={`/profile/${user.$id}`} className="user-card">
       <div className="rounded-full w-14 h-14 overflow-hidden">
         <picture>
-            <source srcSet={user.imageUrl} type="image/webp" />
+            <source srcSet={user.imageId !== null ? user.imageUrl : "/assets/icons/profile-placeholder.svg"} type="image/webp" />
             <img
-                src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                src={user.imageId !== null ? user.imageUrl : "/assets/icons/profile-placeholder.svg"}
                 alt="creator"
                 className="w-full h-full object-cover rounded-full"
                 loading="lazy"
@@ -27,7 +27,7 @@ const UserCard = ({ user }: UserCardProps) => {
         <p className="base-medium text-[#131313] text-center line-clamp-1">
           {user.name}
         </p>
-        <p className="text-[13px] font-normal leading-[140%] text-light-3 text-center justify-center items-center line-clamp-1 flex whitespace-nowrap overflow-ellipsis">
+        <p className="text-[13px] lowercase font-normal leading-[140%] text-light-3 text-center justify-center items-center line-clamp-1 flex whitespace-nowrap overflow-ellipsis">
           @{user.username.toLowerCase().length > 10 ? user.username.slice(0, 10) + "..." : user.username.toLowerCase()}
           { user.$id === import.meta.env.VITE_FOUNDER_ID && <img src="/assets/images/verified.png" alt="verified" style={{height: "16px", width: "16px"}} className="ml-1"/>}
 

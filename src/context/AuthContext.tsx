@@ -10,6 +10,7 @@ export const INITIAL_USER = {
     username: '',
     email: '',
     imageUrl: '',
+    imageId: '',
     bio: ''
 };
 
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children}: {children: ReactNode}) => {
                         name: currentAccount.name,
                         username: currentAccount.username,
                         email: currentAccount.email,
+                        imageId: currentAccount.imageId,
                         imageUrl: currentAccount.imageUrl,
                         bio: currentAccount.bio
                     })

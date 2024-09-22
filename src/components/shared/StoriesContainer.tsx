@@ -88,7 +88,7 @@ const StoriesContainer: React.FC = () => {
               <div className="relative w-16 h-16 rounded-full">
                 <div className="w-16 h-16 rounded-full overflow-hidden ">
                   <img
-                    src={user?.imageUrl}
+                    src={ user?.imageId !== null ? user?.imageUrl : '/assets/icons/profile-placeholder.svg'}
                     alt="Add Story"
                     className="w-full h-full object-cover"
                   />

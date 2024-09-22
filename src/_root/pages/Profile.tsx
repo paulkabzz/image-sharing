@@ -50,11 +50,11 @@ const Profile = () => {
           <div className="w-28 h-28 lg:h-36 lg:w-36 rounded-full overflow-hidden">
             <picture>
               <source
-                srcSet={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                srcSet={currentUser.imageId !== null ? currentUser.imageUrl : "/assets/icons/profile-placeholder.svg" }
                 type="image/webp"
               />
               <img
-                src={currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"}
+                src={currentUser.imageId !== null ? currentUser.imageUrl : "/assets/icons/profile-placeholder.svg"}
                 alt="profile"
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -78,8 +78,8 @@ const Profile = () => {
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
               <StatBlock value={currentUser.posts.length} label="Posts" />
-              <StatBlock value={20} label="Followers" />
-              <StatBlock value={20} label="Following" />
+              <StatBlock value={0} label="Followers" />
+              <StatBlock value={0} label="Following" />
             </div>
 
             <p className="small-medium md:base-medium !text-[#131313] !text-[13px] text-center xl:text-left mt-7 max-w-screen-sm">

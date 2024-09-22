@@ -39,7 +39,7 @@ const PostCard = ({ post } : PostCardProps) => {
             <div className="flex-between">
                 <div className="flex items-center gap-3">
                     <Link to={`/profile/${post.creator.$id}`} className="rounded-full w-12 h-12 overflow-hidden">
-                        <img src={post.creator.imageUrl || '/assets/icons/profile-placeholder.svg'} loading="lazy" alt={post.creator.username} className="w-full h-full object-cover" />
+                        <img src={post.creator.imageId !== null ? post.creator.imageUrl : '/assets/icons/profile-placeholder.svg'} loading="lazy" alt={post.creator.username} className="w-full h-full object-cover" />
                     </Link>
 
                     <div className="flex flex-col">
@@ -64,12 +64,12 @@ const PostCard = ({ post } : PostCardProps) => {
                 <div className="small-medium !text-[13px] lg:base-medium py-5 text-[#131313]">
                     <p>{post.caption}</p>
                     {tags.length > 0 && (
-                        <ul className="flex gap-1 mt-2">
+                        <ul className="flex gap-1 mt-2 flex-wrap ">
                             {tags}
                         </ul>
                     )}
                 </div>
-                <img src={post.imageUrl || '/assets/icons/profile-placeholder.svg'} alt={post.caption || 'post image'} className="post-card_img" />
+                <img src={ post.imageId !== null ? post.imageUrl : '/assets/icons/profile-placeholder.svg'} alt={post.caption || 'post image'} className="post-card_img" />
             </Link>
             <PostStats post={post} userId={user.id} />
         </div>

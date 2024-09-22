@@ -61,8 +61,8 @@ const UserInfo = React.memo(({ creator }: { creator: Models.Document }) => (
     <div className="flex items-center justify-start gap-2">
         <div className="overflow-hidden w-8 h-8 rounded-full">
             <picture className="w-full h-full">
-                <source srcSet={creator.imageUrl} type="image/webp" />
-                <img src={`${creator.imageUrl}/size=small/quality=100`} loading="lazy" alt={creator.username} className="w-full h-full object-cover" />
+                <source srcSet={ creator.imageId !== null ? creator.imageUrl : "/assets/icons/profile-placeholder.svg"} type="image/webp" />
+                <img src={`${creator.imageId !== null ? creator.imageUrl : "/assets/icons/profile-placeholder.svg"}/size=small/quality=100`} loading="lazy" alt={creator.username} className="w-full h-full object-cover" />
             </picture>
         </div>
         <p className="line-clamp-1 flex whitespace-nowrap overflow-ellipsis !lowercase">
