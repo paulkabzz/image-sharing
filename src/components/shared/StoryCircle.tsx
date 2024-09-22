@@ -27,7 +27,7 @@ const StoryCircle: React.FC<StoryCircleProps> = ({ stories, username }) => {
                     <img src={stories[0]?.creator?.imageUrl || '/default-avatar.png'} alt={username} className="w-full h-full object-cover" />
                 </div>
             </div>
-            <p className="text-[#131313] text-[12px] mt-1">{username.length > 10 ? username.substring(0, 10) + "..." : username}</p>
+            <p className="text-[#131313] text-[12px] mt-1 pb-2">{username.length > 10 ? username.substring(0, 10) + "..." : username}</p>
         </div>
     );
 };
