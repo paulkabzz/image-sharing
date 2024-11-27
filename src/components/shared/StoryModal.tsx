@@ -1,12 +1,12 @@
   import React, { useState, useEffect, useCallback } from "react";
   import { IStory } from "@/types";
   import {
-    useDeleteStory,
+    // useDeleteStory,
     useUpdateStoryViews,
     useGetStoryViews,
   } from "@/lib/react-query/queriesAndMutations";
   import { useUserContext } from "@/context/AuthContext";
-  import { useToast } from "../ui/use-toast";
+  // import { useToast } from "../ui/use-toast";
 
   interface StoryModalProps {
     isOpen: boolean;
@@ -30,10 +30,10 @@
     const [isPaused, setIsPaused] = useState(false);
     const [progress, setProgress] = useState(0);
     const { user } = useUserContext();
-    const { mutate: deleteStory } = useDeleteStory();
+    // const { mutate: deleteStory } = useDeleteStory();
     const { mutate: updateStoryViews } = useUpdateStoryViews();
     const { data: viewedStories = [] } = useGetStoryViews(user.id);
-    const { toast } = useToast();
+    // const { toast } = useToast();
 
     const currentStory = stories[currentIndex];
 
@@ -78,29 +78,29 @@
 
     if (!isOpen || !stories || stories.length === 0) return null;
 
-    const handleDeleteStory = () => {
-      if (currentStory.creator.$id !== user.id) {
-        toast({
-          title: "You can only delete your own stories",
-          variant: "destructive",
-        });
-        return;
-      }
+    // const handleDeleteStory = () => {
+    //   if (currentStory.creator.$id !== user.id) {
+    //     toast({
+    //       title: "You can only delete your own stories",
+    //       variant: "destructive",
+    //     });
+    //     return;
+    //   }
 
-      deleteStory(currentStory.$id, {
-        onSuccess: () => {
-          toast({ title: "Story deleted successfully" });
-          if (stories.length === 1) {
-            onClose();
-          } else {
-            goToNextStory();
-          }
-        },
-        onError: () => {
-          toast({ title: "Failed to delete story", variant: "destructive" });
-        },
-      });
-    };
+    //   deleteStory(currentStory.$id, {
+    //     onSuccess: () => {
+    //       toast({ title: "Story deleted successfully" });
+    //       if (stories.length === 1) {
+    //         onClose();
+    //       } else {
+    //         goToNextStory();
+    //       }
+    //     },
+    //     onError: () => {
+    //       toast({ title: "Failed to delete story", variant: "destructive" });
+    //     },
+    //   });
+    // };
 
     return (
       <div className="fixed inset-0 bg-black w-full gap-5 flex items-center justify-center h-[100vh] z-50">
