@@ -2,7 +2,7 @@ import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewStory } from "@/types
 import { account, appwriteConfig, avatars, databases, storage } from "@/lib/appwrite/config";
 
 import { ID, Query } from "appwrite";
-// import { throws } from "assert";
+// import { throws } from "assert"; 
 
 // ============================== CREATE USER ============================== \\
 
