@@ -2,6 +2,7 @@ import { INewPost, INewUser, IUpdatePost, IUpdateUser, INewStory } from "@/types
 import { account, appwriteConfig, avatars, databases, storage } from "@/lib/appwrite/config";
 
 import { ID, Query } from "appwrite";
+import { throws } from "assert";
 
 // ============================== CREATE USER ============================== \\
 
@@ -15,7 +16,7 @@ export async function createUserAccount (user: INewUser){
                 user.name,
             )
 
-            if(!newAccount) throw Error;
+            if(!newAccount) throw new Error("Failed to create user account");
 
 
             const avatarUrl = avatars.getInitials(user.name);
@@ -26,13 +27,18 @@ export async function createUserAccount (user: INewUser){
                 email: newAccount.email,
                 username: user.username,
                 imageUrl: avatarUrl,
-            })
+            });
+            
+            if(!newUser) {
+                await deleteFile(avatarUrl.href);
+                throw new Error("Failed to save user to DB");
+            }
 
             return newUser;
             
         } catch (error) {
-            console.log('err', error);
-            return error;
+            console.error('err', error);
+            throw new Error("Failed to create user account");
         }
 }
 
@@ -55,8 +61,8 @@ export async function saveUserToDB(user: {
 
         return newUser;
     } catch (error) {
-        console.log(error)
-        return;
+        console.error(error);
+        throw new Error("Failed to save user to DB");
     }
 }
 
@@ -71,8 +77,8 @@ export async function signInAccount (user: {email: string, password: string}) {
         return session;
         
     } catch (error) {
-        console.log(error);
-        return;
+        console.error(error);
+        throw new Error("Failed to sign in account");
     }
 
 }
@@ -84,7 +90,7 @@ export async function getCurrentUser() {
 
         const currentAccount = await account.get();
 
-        if (!currentAccount) throw Error;
+        if (!currentAccount) throw new Error("Failed to get current user");
 
         const currentUser = await databases.listDocuments(
             appwriteConfig.databaseId,
@@ -92,12 +98,13 @@ export async function getCurrentUser() {
             [Query.equal('accountId', currentAccount.$id)]
         );
 
-        if (!currentUser) throw Error;
+        if (!currentUser) throw new Error("Failed to get current user");
 
         return currentUser.documents[0];
         
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        throw new Error("Failed to get current user");
     }
 }
 
@@ -112,7 +119,7 @@ export async function signOutAccount() {
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to sign out account");
     }
 }
 
@@ -132,7 +139,7 @@ export async function createPost(post: INewPost) {
         //upload image to storage
         const uploadedFile = await uploadFile(file);
 
-        if (!uploadedFile) throw Error;
+        if (!uploadedFile) throw new Error("Failed to upload file");
 
         //Get file URL
         const fileUrl = getFilePreview(uploadedFile.$id);
@@ -141,7 +148,7 @@ export async function createPost(post: INewPost) {
 
         if(!fileUrl) {
             deleteFile(uploadedFile.$id);
-            throw Error;
+            throw new Error("Failed to get file url");
         }
 
         //convert tags into an array
@@ -166,14 +173,14 @@ export async function createPost(post: INewPost) {
 
         if (!newPost) {
             await deleteFile(uploadedFile.$id);
-            throw Error;
+            throw new Error("Failed to save post to DB");
         }
 
         return newPost;
 
     } catch (error) {
         console.error("Error in createPost:", error);
-        throw error; // Re-throw the error for the caller to handle
+        throw new Error("Failed to create post");
     }
     
 }
@@ -195,7 +202,7 @@ export async function uploadFile(file: File) {
         return uploadedFile;
     } catch (error) {
         console.error("Error in uploadFile:", error);
-        throw error; // Re-throw the error for the caller to handle
+        throw new Error("Failed to upload file");
     }
 }
 
@@ -217,7 +224,7 @@ export function getFilePreview (fileId: string) {
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to get file preview");
     }
 }
 // ============================== DELETE FILE ============================== \\
@@ -232,7 +239,7 @@ export async function deleteFile (fileId: string) {
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to delete file");
     }
 }
 
@@ -245,7 +252,7 @@ export async function getRecentPosts() {
         [Query.orderDesc('$createdAt'), Query.limit(20)]
     );
 
-    if(!posts) throw Error;
+    if(!posts) throw new Error("Failed to get recent posts");
     return posts;
 }
 
@@ -263,12 +270,12 @@ export async function likePost (postId: string, likesArray:string[]) {
             }
         );
 
-        if(!updatedPost) throw Error;
+        if(!updatedPost) throw new Error("Failed to like post");
         return updatedPost;
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to like post");
     }
 }
 
@@ -287,12 +294,12 @@ export async function savePost (postId: string, userId:string) {
             }
         );
 
-        if(!updatedPost) throw Error;
+        if(!updatedPost) throw new Error("Failed to save post");
         return updatedPost;
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to save post");
     }
 }
 
@@ -307,12 +314,12 @@ export async function deleteSavedPost (savedRecordId: string) {
             savedRecordId,
         );
 
-        if(!statusCode) throw Error;
+        if(!statusCode) throw new Error("Failed to delete saved post");
         return { status: 'ok' };
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to delete saved post");
     }
 }
 
@@ -327,11 +334,12 @@ export async function getPostById(postId: string) {
             postId
         );
 
+        if(!post) throw new Error("Failed to get post by id");
         return post;
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to get post by id");
     }
 }
 
@@ -353,16 +361,14 @@ export async function updatePost(post: IUpdatePost) {
 
         const uploadedFile = await uploadFile(post.file[0]);
 
-            if (!uploadedFile) throw Error;
+            if (!uploadedFile) throw new Error("Failed to upload file");
 
             //Get file URL
-            const fileUrl = getFilePreview(uploadedFile.$id);
-            console.log({fileUrl});
-            
+            const fileUrl = getFilePreview(uploadedFile.$id);            
     
             if(!fileUrl) {
                 deleteFile(uploadedFile.$id);
-                throw Error;
+                throw new Error("Failed to get file url");
             }
     
             image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id};
@@ -390,14 +396,14 @@ export async function updatePost(post: IUpdatePost) {
 
         if (!updatedPost) {
             await deleteFile(post.imageId);
-            throw Error;
+            throw new Error("Failed to update post");
         }
 
         return updatedPost;
 
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to update post");
     }
     
 }
@@ -414,14 +420,14 @@ export async function deletePost(postId?: string, imageId?: string) {
         postId
       );
   
-      if (!statusCode) throw Error;
+      if (!statusCode) throw new Error("Failed to delete post");
   
       await deleteFile(imageId);
   
       return { status: "Ok" };
     } catch (error) {
       console.error(error);
-      return;
+      throw new Error("Failed to delete post");
     }
   }
 
@@ -437,13 +443,13 @@ export async function searchPosts(searchTerm: string) {
             [Query.search('caption', searchTerm)]
         );
 
-        if (!posts) throw Error;
+        if (!posts) throw new Error("Failed to search posts");
 
         return posts;
         
     } catch (error) {
         console.error(error);
-        return;
+        throw new Error("Failed to search posts");
     };
 };
 
@@ -463,12 +469,12 @@ export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
         queries
       );
   
-      if (!posts) throw Error;
+      if (!posts) throw new Error("No posts found");
   
       return posts;
     } catch (error) {
-      console.log(error);
-      return;
+      console.error(error);
+      throw new Error("Failed to fetch posts");
     }
   }
 
@@ -488,12 +494,12 @@ export async function getUsers(limit?: number) {
         queries
       );
   
-      if (!users) throw Error;
+      if (!users) throw new Error("No users found");
   
       return users;
     } catch (error) {
       console.error(error);
-      return void 0;
+      throw new Error("Failed to fetch users");
     }
   }
 
@@ -509,11 +515,12 @@ export async function getUsers(limit?: number) {
         [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
       );
   
-      if (!post) throw Error;
+      if (!post) throw new Error("No posts found");
   
       return post;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw new Error("Failed to fetch user posts");
     }
   }
 
@@ -527,19 +534,22 @@ export async function getUsers(limit?: number) {
         userId
       );
   
-      if (!user) throw Error;
+      if (!user) throw new Error("No user found");
   
       return user;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw new Error("Failed to fetch user by ID");
     }
   }
+
+  //0640014810 - Lihle  
   
   // ============================== UPDATE USER ============================== \\
 
   export async function updateUser(user: IUpdateUser) {
     const hasFileToUpdate = user.file.length > 0;
-    try {
+    try { 
       let image = {
         imageUrl: user.imageUrl,
         imageId: user.imageId,
@@ -548,13 +558,13 @@ export async function getUsers(limit?: number) {
       if (hasFileToUpdate) {
         // Upload new file to appwrite storage
         const uploadedFile = await uploadFile(user.file[0]);
-        if (!uploadedFile) throw Error;
+        if (!uploadedFile) throw new Error("Failed to upload file");
   
         // Get new file url
         const fileUrl = getFilePreview(uploadedFile.$id);
         if (!fileUrl) {
           await deleteFile(uploadedFile.$id);
-          throw Error;
+          throw new Error("Failed to get file url");
         }
   
         image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
@@ -581,7 +591,7 @@ export async function getUsers(limit?: number) {
           await deleteFile(image.imageId);
         }
         // If no new file uploaded, just throw error
-        throw Error;
+        throw new Error("Failed to update user");
       }
   
       // Safely delete old file after successful update
@@ -591,7 +601,8 @@ export async function getUsers(limit?: number) {
   
       return updatedUser;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw new Error("Failed to update user");
     }
   }
 
@@ -611,14 +622,14 @@ export async function createStory(story: INewStory) {
         // Upload image to storage
         const uploadedFile = await uploadFile(file);
 
-        if (!uploadedFile) throw Error;
+        if (!uploadedFile) throw new Error("Failed to upload file");
 
         // Get file URL
         const fileUrl = getFilePreview(uploadedFile.$id);
 
         if(!fileUrl) {
             deleteFile(uploadedFile.$id);
-            throw Error;
+            throw new Error("Failed to get file url");
         }
 
         // Save story to DB
@@ -636,14 +647,14 @@ export async function createStory(story: INewStory) {
 
         if (!newStory) {
             await deleteFile(uploadedFile.$id);
-            throw Error;
+            throw new Error("Failed to create story")   ;
         }
 
         return newStory;
 
     } catch (error) {
         console.error("Error in createStory:", error);
-        throw error;
+        throw new Error("Failed to create story");
     }
 }
 
@@ -660,7 +671,7 @@ export async function getRecentStories() {
         ]
     );
 
-    if(!stories) throw Error;
+    if(!stories) throw new Error("No stories found");
     return stories;
 }
 
@@ -686,7 +697,7 @@ export async function deleteExpiredStories() {
         return { status: 'ok' };
     } catch (error) {
         console.error("Error in deleteExpiredStories:", error);
-        throw error;
+        throw new Error("Failed to delete expired stories");
     }
 }
 
@@ -720,7 +731,7 @@ export async function deleteStory(storyId: string) {
         return { status: 'ok' };
     } catch (error) {
         console.error("Error in deleteStory:", error);
-        throw error;
+        throw new Error("Failed to delete story");
     }
 }
 
@@ -761,6 +772,6 @@ export async function updateStoryViews(storyId: string, userId: string, creatorI
         }
     } catch (error) {
         console.error("Error in updateStoryViews:", error);
-        throw error;
+        throw new Error("Failed to update story views");
     }
 }

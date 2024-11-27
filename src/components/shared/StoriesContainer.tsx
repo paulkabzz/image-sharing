@@ -17,6 +17,7 @@ const StoriesContainer: React.FC = () => {
   const [selectedUserStories, setSelectedUserStories] = useState<IStory[]>([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUserIndex, setCurrentUserIndex] = useState<number | null>(null); // New state
 
   const sortedGroupedStories = useMemo(() => {
     if (!recentStories || !recentStories.documents) return {} as GroupedStories;
@@ -63,32 +64,29 @@ const StoriesContainer: React.FC = () => {
   const userStories = sortedGroupedStories[user.id] || [];
   const otherUserStories = Object.entries(sortedGroupedStories).filter(([userId]) => userId !== user.id);
 
-  const handleStoryClick = (stories: IStory[]) => {
+  const handleStoryClick = (stories: IStory[], userIndex: number) => {
     setSelectedUserStories(stories);
     setCurrentStoryIndex(0);
+    setCurrentUserIndex(userIndex); // Set the current user index
     setIsModalOpen(true);
   };
 
   if (isLoading) return <div>Loading stories...</div>;
-  // if (!recentStories || recentStories.documents.length === 0) return <div>No stories to display</div>;
 
   return (
     <div className="mb-0 w-full">
       <div className="flex overflow-x-auto gap-8 pb-6 w-full">
         <div className="flex flex-col items-center cursor-pointer">
           {userStories.length > 0 ? (
-            <div onClick={() => handleStoryClick(userStories)}>
-              <StoryCircle
-                stories={userStories}
-                username="Your Story"
-              />
+            <div onClick={() => handleStoryClick(userStories, -1)}>
+              <StoryCircle stories={userStories} username="Your Story" />
             </div>
           ) : (
             <Link to="/create-story" className="flex flex-col items-center">
               <div className="relative w-16 h-16 rounded-full">
                 <div className="w-16 h-16 rounded-full overflow-hidden ">
                   <img
-                    src={ user?.imageId !== null ? user?.imageUrl : '/assets/icons/profile-placeholder.svg'}
+                    src={user?.imageId !== null ? user?.imageUrl : '/assets/icons/profile-placeholder.svg'}
                     alt="Add Story"
                     className="w-full h-full object-cover"
                   />
@@ -102,11 +100,8 @@ const StoriesContainer: React.FC = () => {
           )}
         </div>
 
-        {otherUserStories.map(([userId, stories]) => (
-          <div
-            key={userId}
-            onClick={() => handleStoryClick(stories)}
-          >
+        {otherUserStories.map(([userId, stories], index) => (
+          <div key={userId} onClick={() => handleStoryClick(stories, index)}>
             <StoryCircle
               stories={stories}
               username={stories[0]?.creator?.username || 'Unknown User'}
@@ -115,13 +110,15 @@ const StoriesContainer: React.FC = () => {
         ))}
       </div>
       {selectedUserStories.length > 0 && (
-        <StoryModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          stories={selectedUserStories}
-          currentIndex={currentStoryIndex}
-          setCurrentIndex={setCurrentStoryIndex}
-        />
+         <StoryModal
+         isOpen={isModalOpen}
+         onClose={() => setIsModalOpen(false)}
+         stories={selectedUserStories}
+         currentIndex={currentStoryIndex}
+         setCurrentIndex={setCurrentStoryIndex}
+         previousUserStories={currentUserIndex !== null && currentUserIndex > 0 ? otherUserStories[currentUserIndex - 1]?.[1] : []} // Handle previous user stories
+         nextUserStories={currentUserIndex !== null && currentUserIndex < otherUserStories.length - 1 ? otherUserStories[currentUserIndex + 1]?.[1] : []} // Handle next user stories
+       />
       )}
     </div>
   );
