@@ -141,6 +141,7 @@ export const useUpdatePost = ()  => {
         },
     });
 };
+
 export const useDeletePost = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -152,7 +153,6 @@ export const useDeletePost = () => {
       },
     });
   };
-  
 
   export const useGetPosts = () => {
     return useInfiniteQuery({
@@ -254,9 +254,6 @@ export const useDeleteExpiredStories = () => {
     });
 };
 
-
-// ... existing code ...
-
 export const useDeleteStory = () => {
   const queryClient = useQueryClient();
   
@@ -284,7 +281,6 @@ export const useUpdateStoryViews = () => {
   });
 };
 
-// Add this new query hook
 export const useGetStoryViews = (userId: string) => {
   return useQuery({
     queryKey: ['storyViews', userId],
@@ -292,7 +288,7 @@ export const useGetStoryViews = (userId: string) => {
       try {
         const response = await databases.listDocuments(
           appwriteConfig.databaseId,
-          appwriteConfig.storyViewsCollectionId, // Make sure this is the correct ID for your StoryViews collection
+          appwriteConfig.storyViewsCollectionId,
           [Query.equal("userId", userId)]
         );
         return response.documents.map((doc: any) => doc.storyId);
